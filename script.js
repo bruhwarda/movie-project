@@ -1,28 +1,79 @@
-document.getElementById("submitBtn").addEventListener("click", function () {
-  var movieName = document.getElementById("movieName").value;
-  var yearLaunched = document.getElementById("yearLaunched").value;
+async function searchButton() {
+  const apiKey = "98f43e48";
 
-  var apiKey = "98f43e48";
-  var apiUrl = `https://www.omdbapi.com/?s=${movieName}&y=${yearLaunched}&apikey=${apiKey}`;
+  const movieName = document.getElementById("movieName").value;
+  const yearLaunched = document.getElementById("yearLaunched").value;
 
-  fetch(apiUrl)
-    .then((response) => response.json())
-    .then((data) => {
-      var resultContainer = document.getElementById("resultContainer");
-      var movieList = document.getElementById("movieList");
+  if (!movieName) {
+    alert("Please enter a movie name.");
+    return;
+  }
 
-      if (data.Response === "True") {
-        resultContainer.style.display = "block";
-        movieList.innerHTML = "";
+  if (!yearLaunched) {
+    alert("Please enter a movie Year.");
+    return;
+  }
 
-        data.Search.forEach(function (movie) {
-          var li = document.createElement("li");
-          li.textContent = `Title: ${movie.Title}, Year: ${movie.Year}`;
-          movieList.appendChild(li);
-        });
-      } else {
-        alert("Movies not found. Please check the information.");
+  let url = `http://www.omdbapi.com/?s=${movieName}&apikey=${apiKey}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.Response === "True") {
+      const resultContainer = document.getElementById("resultContainer");
+      resultContainer.style.display = "block";
+
+      const movieList = document.getElementById("movieList");
+      movieList.innerHTML = "";
+
+      let moviesToShow = data.Search;
+
+      if (yearLaunched) {
+        moviesToShow = moviesToShow.filter(
+          (movie) => movie.Year >= yearLaunched
+        );
       }
-    })
-    .catch((error) => console.error("Error:", error));
-});
+
+      let movieItems = moviesToShow.map((movie) => {
+        const li = document.createElement("li");
+        li.classList.add("movie-item");
+        li.innerHTML = `
+            <h2>${movie.Title}</h2>
+            <p>Year: ${movie.Year}</p>
+            <img src="${movie.Poster}" alt="${movie.Title} Poster">
+        `;
+        return li;
+      });
+
+      movieList.append(...movieItems);
+    } else {
+      displayErrorPopup("No movies found!");
+    }
+  } catch (error) {
+    console.error("Error fetching movie data:", error);
+    displayErrorPopup("Error fetching movie data. Please try again later.");
+  }
+}
+
+function displayErrorPopup(message) {
+  const popupContainer = document.createElement("div");
+  popupContainer.classList.add("popup-container");
+
+  const popup = document.createElement("div");
+  popup.classList.add("popup");
+
+  const closeButton = document.createElement("button");
+  closeButton.innerText = "Close";
+  closeButton.addEventListener("click", () => {
+    popupContainer.remove();
+  });
+
+  const errorMessage = document.createElement("p");
+  errorMessage.innerText = message;
+
+  popup.appendChild(errorMessage);
+  popup.appendChild(closeButton);
+  popupContainer.appendChild(popup);
+  document.body.appendChild(popupContainer);
+}
