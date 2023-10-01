@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Information</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="input-container">
+            <label for="movieName">Movie Name:</label>
+            <input type="text" id="movieName" required>
+        </div>
+        <div class="input-container">
+            <label for="yearLaunched">Year Launched:</label>
+            <input type="number" id="yearLaunched" min="1800" max="9999" required>
+        </div>
+        <button id="submitBtn">Get Movie Info</button>
+    </div>
+
+    <div class="result-container" id="resultContainer">
+        <h2>Movie Information:</h2>
+        <ul id="movieList"></ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
